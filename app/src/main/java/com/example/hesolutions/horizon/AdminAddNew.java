@@ -594,7 +594,7 @@ public class AdminAddNew extends Activity {
                 final ArrayList<Device> list = sectordetail.get(SectorName);
 
                 if (choosedevice.isEmpty() || choosedevice == null) {
-                    Toast.makeText(AdminAddNew.this, "At least one user should be selected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AdminAddNew.this, "At least one device should be selected", Toast.LENGTH_SHORT).show();
                 } else {
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(AdminAddNew.this.getParent());
                     alertDialog.setTitle("Warning");
@@ -922,5 +922,10 @@ public class AdminAddNew extends Activity {
     {
         super.onPause();
         myHandler.removeCallbacks(myRunnable);
+    }
+    @Override
+    public void onBackPressed()
+    {
+        // super.onBackPressed(); // Comment this super call to avoid calling finish()
     }
 }

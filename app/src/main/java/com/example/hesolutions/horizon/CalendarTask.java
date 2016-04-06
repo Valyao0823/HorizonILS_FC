@@ -977,4 +977,9 @@ public class CalendarTask extends Activity {
         super.onPause();
         myHandler.removeCallbacks(myRunnable);
     }
+    @Override
+    public void onBackPressed()
+    {
+        // super.onBackPressed(); // Comment this super call to avoid calling finish()
+    }
 }

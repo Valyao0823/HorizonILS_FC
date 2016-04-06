@@ -25,4 +25,9 @@ public class ScreenSaver extends Activity {
             }
         });
     }
+    @Override
+    public void onBackPressed()
+    {
+        // super.onBackPressed(); // Comment this super call to avoid calling finish()
+    }
 }

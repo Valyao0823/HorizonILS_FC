@@ -305,7 +305,7 @@ public class AdminPage extends Activity {
         {
             AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             deviceName = deviceAdptername.get(info.position);
-            menu.setHeaderTitle(userName);
+            menu.setHeaderTitle(deviceName);
             menu.add(0, 3, 0, "Delete");
         }
     }
@@ -779,6 +779,11 @@ public class AdminPage extends Activity {
     {
         super.onPause();
         myHandler.removeCallbacks(myRunnable);
+    }
+    @Override
+    public void onBackPressed()
+    {
+        // super.onBackPressed(); // Comment this super call to avoid calling finish()
     }
 }
 
