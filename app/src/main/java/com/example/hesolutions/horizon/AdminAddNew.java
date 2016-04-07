@@ -601,14 +601,13 @@ public class AdminAddNew extends Activity {
                     alertDialog.setMessage("This action will remove the device from the old sector.");
                     alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
-
-                            for (Map.Entry<String, HashMap> entry : sector.entrySet()) {
-                                HashMap<String, ArrayList<Device>> sectorinfo = entry.getValue();
-                                for (Map.Entry<String, ArrayList<Device>> deviceentry : sectorinfo.entrySet()) {
-                                    ArrayList<Device> deviceArrayList = deviceentry.getValue();
-                                    if (deviceArrayList!=null) {
-                                        Iterator<Device> deviceIterator = deviceArrayList.iterator();
-                                        for (Device device : choosedevice) {
+                            for (Device device : choosedevice) {
+                                for (Map.Entry<String, HashMap> entry : sector.entrySet()) {
+                                    HashMap<String, ArrayList<Device>> sectorinfo = entry.getValue();
+                                    for (Map.Entry<String, ArrayList<Device>> deviceentry : sectorinfo.entrySet()) {
+                                        ArrayList<Device> deviceArrayList = deviceentry.getValue();
+                                        if (deviceArrayList != null) {
+                                            Iterator<Device> deviceIterator = deviceArrayList.iterator();
                                             while (deviceIterator.hasNext()) {
                                                 if (device.getDeviceName().equals(deviceIterator.next().getDeviceName())) {
                                                     deviceIterator.remove();

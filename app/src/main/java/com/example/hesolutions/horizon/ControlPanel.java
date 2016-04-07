@@ -268,6 +268,9 @@ public class ControlPanel extends Activity {
                                     public void onClick(DialogInterface dialog, int which) {
                                         byte[] data;
                                         data = new byte[]{(byte) 17, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
+                                        DeviceSocket.getInstance().send(Message.createMessage((byte) 4, DevicePacket.createPacket((byte) 4,
+                                                        devicea.getDeviceAddress(), (short) 0, data), devicea.getGatewayMacAddr(), devicea.getGatewayPassword(),
+                                                devicea.getGatewaySSID(), ControlPanel.this));
                                         devicea.setCurrentParams(data);
                                         devicea.setChannelMark((short) 5);
                                         DatabaseManager.getInstance().updateDevice(devicea);
@@ -337,6 +340,9 @@ public class ControlPanel extends Activity {
 
                                         byte[] data;
                                         data = new byte[]{(byte) 17, (byte) 0, (byte)0, (byte) 0, (byte) 0};
+                                        DeviceSocket.getInstance().send(Message.createMessage((byte) 4, DevicePacket.createPacket((byte) 4,
+                                                        device.getDeviceAddress(), (short) 0, data), device.getGatewayMacAddr(), device.getGatewayPassword(),
+                                                device.getGatewaySSID(), ControlPanel.this));
                                         device.setCurrentParams(data);
                                         device.setChannelMark((short) 5);
                                         DatabaseManager.getInstance().updateDevice(device);
@@ -482,6 +488,9 @@ public class ControlPanel extends Activity {
                                                 for (Device thedevice : devicelist) {
                                                     byte[] data;
                                                     data = new byte[]{(byte) 17, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
+                                                    DeviceSocket.getInstance().send(Message.createMessage((byte) 4, DevicePacket.createPacket((byte) 4,
+                                                                    thedevice.getDeviceAddress(), (short) 0, data), thedevice.getGatewayMacAddr(), thedevice.getGatewayPassword(),
+                                                            thedevice.getGatewaySSID(), ControlPanel.this));
                                                     thedevice.setCurrentParams(data);
                                                     thedevice.setChannelMark((short) 5);
                                                     DatabaseManager.getInstance().updateDevice(thedevice);

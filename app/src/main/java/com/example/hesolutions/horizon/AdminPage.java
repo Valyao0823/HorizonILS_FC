@@ -524,6 +524,7 @@ public class AdminPage extends Activity {
                             {
                                 if (singlesectorinfo.getKey().equals(sectorName))
                                 {
+                                    sectioninformation = sector.get(sectorinfo.getKey());
                                     sectioninformation.put(sectorName, devicelist);
                                     sector.put(sectorinfo.getKey(), sectioninformation);
                                 }
