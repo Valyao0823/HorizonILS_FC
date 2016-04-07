@@ -59,6 +59,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class HomePage extends AppCompatActivity {
     final SimpleDateFormat sdf = new SimpleDateFormat("MMM dd yyyy HH mm");
@@ -122,70 +130,71 @@ public class HomePage extends AppCompatActivity {
             e.printStackTrace();
         }
 
-
         Calendar today = Calendar.getInstance();
-
+        Calendar newtoday = Calendar.getInstance();
+        newtoday.set(Calendar.SECOND, 0);
+        newtoday.set(Calendar.MINUTE, 0);
+        newtoday.set(Calendar.HOUR_OF_DAY, 0);
+        newtoday.add(Calendar.DATE, 1);
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("*************running new thread");
-                GetNewEvent();
+                    System.out.println("************ load new events");
+                    GetNewEvent();
             }
-        }, today.getTime(), 1000 * 60 * 60 * 24);
+        }, newtoday.getTime(), 1000 * 60 * 60);
 
 
         final Timer maintimer = new Timer();
         maintimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                Gateway gateway = SysApplication.getInstance().getCurrGateway(HomePage.this);
-                if (gateway != null) {
-                    if (alertDialog != null && alertDialog.isShowing()) alertDialog.dismiss();
-                    if (emergency == false) {
-                        System.out.println("*************running main thread");
-                        MakeAlert();
-                    } else {
-                        ArrayList<Device> deviceArrayList = DatabaseManager.getInstance().getDeviceList().getmDeviceList();
-                        for (Device device : deviceArrayList) {
-                            byte[] data;
-                            data = new byte[]{(byte) 17, (byte) 100, (byte) 0, (byte) 0, (byte) 0};
-                            DeviceSocket.getInstance().send(Message.createMessage((byte) 4, DevicePacket.createPacket((byte) 4,
-                                            device.getDeviceAddress(), (short) 0, data), device.getGatewayMacAddr(), device.getGatewayPassword(),
-                                    device.getGatewaySSID(), HomePage.this));
-
-                        }
-                    }
-                } else {
-                    System.out.println("*************will?");
-                    //maintimer.cancel();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (alertDialog != null && alertDialog.isShowing()) {
-                            } else {
-                                builder = new AlertDialog.Builder(HomePage.this);
-                                builder.setTitle("Error");
-                                builder.setMessage("Gateway Error, please connect the wifi and press OK");
-                                builder.setCancelable(false);
-                                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        Intent i = getBaseContext().getPackageManager()
-                                                .getLaunchIntentForPackage(getBaseContext().getPackageName());
-                                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                        int mPendingIntentId = 3;
-                                        PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId, i, PendingIntent.FLAG_CANCEL_CURRENT);
-                                        AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
-                                        mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
-                                        System.exit(0);
-                                    }
-                                });
-                                alertDialog = builder.create();
-                                alertDialog.show();
+                    Gateway gateway = SysApplication.getInstance().getCurrGateway(HomePage.this);
+                    if (gateway != null) {
+                        if (alertDialog != null && alertDialog.isShowing()) alertDialog.dismiss();
+                        if (emergency == false) {
+                            System.out.println("*********** main thread");
+                            MakeAlert();
+                        } else {
+                            ArrayList<Device> deviceArrayList = DatabaseManager.getInstance().getDeviceList().getmDeviceList();
+                            for (Device device : deviceArrayList) {
+                                byte[] data;
+                                data = new byte[]{(byte) 17, (byte) 100, (byte) 0, (byte) 0, (byte) 0};
+                                DeviceSocket.getInstance().send(Message.createMessage((byte) 4, DevicePacket.createPacket((byte) 4,
+                                                device.getDeviceAddress(), (short) 0, data), device.getGatewayMacAddr(), device.getGatewayPassword(),
+                                        device.getGatewaySSID(), HomePage.this));
                             }
                         }
-                    });
-                }
+                    } else {
+                        //maintimer.cancel();
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (alertDialog != null && alertDialog.isShowing()) {
+                                } else {
+                                    builder = new AlertDialog.Builder(HomePage.this);
+                                    builder.setTitle("Error");
+                                    builder.setMessage("Gateway Error, please connect the wifi and press OK");
+                                    builder.setCancelable(false);
+                                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            Intent i = getBaseContext().getPackageManager()
+                                                    .getLaunchIntentForPackage(getBaseContext().getPackageName());
+                                            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            int mPendingIntentId = 3;
+                                            PendingIntent mPendingIntent = PendingIntent.getActivity(getApplicationContext(), mPendingIntentId, i, PendingIntent.FLAG_CANCEL_CURRENT);
+                                            AlarmManager mgr = (AlarmManager) getApplicationContext().getSystemService(Context.ALARM_SERVICE);
+                                            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000, mPendingIntent);
+                                            System.exit(0);
+                                        }
+                                    });
+                                    alertDialog = builder.create();
+                                    alertDialog.show();
+                                }
+                            }
+                        });
+                    }
             }
         }, today.getTime(), 1000 * 20);
 
@@ -210,7 +219,7 @@ public class HomePage extends AppCompatActivity {
                                     device.getGatewaySSID(), HomePage.this));
                         }
                     } else {
-                        myHandler.postDelayed(myRunnable, 60*3*1000);
+                        myHandler.postDelayed(myRunnable, 60 * 3 * 1000);
                         if (alertDialog != null && alertDialog.isShowing()) {
                         } else {
                             builder = new AlertDialog.Builder(HomePage.this);
@@ -244,7 +253,6 @@ public class HomePage extends AppCompatActivity {
     }
 
     public void MakeAlert() {
-        System.out.println("****************************************** start");
         List<WeekViewEvent> events;
         Calendar cal = Calendar.getInstance();
         events = DataManager.getInstance().getnewevents();
@@ -260,8 +268,6 @@ public class HomePage extends AppCompatActivity {
                 String username = event.getName();
                 int intensity = event.getIntensity();
 
-                long mills = cal.getTimeInMillis() - start.getTimeInMillis();
-                long days = mills / (1000 * 60 * 60 * 24);
                 if (cal.before(finish) && cal.after(start)) {
                     Iterator<String> stringIterator = sectorsname.iterator();
                     while (stringIterator.hasNext()) {
@@ -274,7 +280,6 @@ public class HomePage extends AppCompatActivity {
                                     while (deviceiterator.hasNext()) {
                                         Device device1 = deviceiterator.next();
                                         if (device1.getDeviceName().equals(device.getDeviceName())) {
-                                            System.out.println(device1.getDeviceName() + " is turnning on ************************");
                                             deviceiterator.remove();
                                         }
                                     }
@@ -307,10 +312,6 @@ public class HomePage extends AppCompatActivity {
                         }
                     }
                 }
-                if (sectorsname.size() == 0 || days > 30) {
-                    System.out.println("****************************** event is removed");
-                    eventIterator.remove();
-                }
             }
 
             if (arrayList != null) {
@@ -318,7 +319,6 @@ public class HomePage extends AppCompatActivity {
                 while (deviceiterator.hasNext()) {
                     Device device = deviceiterator.next();
                     Device thedevice = DatabaseManager.getInstance().getDeviceInforName(device.getDeviceName());
-                    System.out.println(" turnning off**************************"+ thedevice.getDeviceName());
                     if (thedevice != null) {
                         if (thedevice.getChannelMark() != 5) {
                             byte[] data;
@@ -362,9 +362,6 @@ public class HomePage extends AppCompatActivity {
                 }
             }
         }
-
-        DataManager.getInstance().setnewevents(events);
-        System.out.println("****************************************** end");
     }
 
     public void clickHandler(View v) {
@@ -463,6 +460,19 @@ public class HomePage extends AppCompatActivity {
                 if (days <= 30) {
                     newevents.add(event);
                     eventIterator.remove();
+                }
+            }
+        }
+        if (newevents!=null)
+        {
+            Iterator<WeekViewEvent> neweventIterator = newevents.iterator();
+            while (neweventIterator.hasNext()) {
+                WeekViewEvent event = neweventIterator.next();
+                long eventday = event.getStartTime().getTimeInMillis();
+                long mills = today - eventday;
+                long days = mills / (1000 * 60 * 60 * 24);
+                if (days >= 30) {
+                    neweventIterator.remove();
                 }
             }
         }

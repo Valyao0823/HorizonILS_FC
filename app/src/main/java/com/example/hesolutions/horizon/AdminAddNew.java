@@ -598,28 +598,27 @@ public class AdminAddNew extends Activity {
                 } else {
                     AlertDialog.Builder alertDialog = new AlertDialog.Builder(AdminAddNew.this.getParent());
                     alertDialog.setTitle("Warning");
-                    alertDialog.setMessage("The action will remove the device from the old sector.");
+                    alertDialog.setMessage("This action will remove the device from the old sector.");
                     alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
+
                             for (Map.Entry<String, HashMap> entry : sector.entrySet()) {
                                 HashMap<String, ArrayList<Device>> sectorinfo = entry.getValue();
-                                Iterator<Device> deviceIterator = choosedevice.iterator();
-                                while (deviceIterator.hasNext()) {
-                                    Device choosedevicesample = deviceIterator.next();
-                                    for (Map.Entry<String, ArrayList<Device>> deviceentry : sectorinfo.entrySet()) {
-                                        ArrayList<Device> deviceArrayList1 = deviceentry.getValue();
-                                        if (deviceArrayList1!=null) {
-                                            Iterator<Device> deviceIterator1 = deviceArrayList1.iterator();
-                                            while (deviceIterator1.hasNext()) {
-                                                Device sectordevicename = deviceIterator1.next();
-                                                if (sectordevicename.getDeviceName().equals(choosedevicesample.getDeviceName())) {
-                                                    deviceIterator1.remove();
+                                for (Map.Entry<String, ArrayList<Device>> deviceentry : sectorinfo.entrySet()) {
+                                    ArrayList<Device> deviceArrayList = deviceentry.getValue();
+                                    if (deviceArrayList!=null) {
+                                        Iterator<Device> deviceIterator = deviceArrayList.iterator();
+                                        for (Device device : choosedevice) {
+                                            while (deviceIterator.hasNext()) {
+                                                if (device.getDeviceName().equals(deviceIterator.next().getDeviceName())) {
+                                                    deviceIterator.remove();
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
+
                             if (list!=null)
                             {
                                 list.addAll(choosedevice);

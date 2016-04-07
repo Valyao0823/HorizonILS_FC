@@ -133,7 +133,6 @@ public class CalendarTask extends Activity {
         finishtime.setText(currenttime);
         final Calendar startTime = Calendar.getInstance();
         final Calendar finishTime = Calendar.getInstance();
-
         day =startTime.get(Calendar.DAY_OF_WEEK)-1;
         weeknumber.setFilters(new InputFilter[]{new InputFiletMinMax("1","52")});
         ImageView homescreenBgImage = (ImageView) findViewById(R.id.imageView);
@@ -313,19 +312,6 @@ public class CalendarTask extends Activity {
                         if (sectors.contains("Select All")) sectors.remove("Select All");
                     }
                 }
-                /*
-                for (String sectorname : sectors) {
-                    ArrayList<Device> deviceArrayList = (ArrayList<Device>)sector.get(username).get(sectorname);
-                    if (deviceArrayList != null) {
-                        for (Device device : deviceArrayList) {
-                            byte[] data;
-                            data = new byte[]{(byte) 17, (byte) intensity, (byte) 0, (byte) 0, (byte) 0};
-                            device.setCurrentParams(data);
-                            DatabaseManager.getInstance().updateDevice(device);
-                        }
-                    }
-                }
-                */
 
                 if (gateway!=null) {
                     if (sectors.isEmpty()) {
@@ -613,7 +599,6 @@ public class CalendarTask extends Activity {
                                             }
                                             @Override
                                             protected void onPostExecute(Void res) {
-
                                                 DataManager.getInstance().setEventID(IDlist);
                                                 DataManager.getInstance().setevents(list);
                                                 DataManager.getInstance().setnewevents(newlist);

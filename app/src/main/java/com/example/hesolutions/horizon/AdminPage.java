@@ -299,7 +299,7 @@ public class AdminPage extends Activity {
             userName = names.get(info.position);
             menu.setHeaderTitle(userName);
             menu.add(0, 2, 0, "Delete");
-            menu.add(0, 4, 0, "Change Passwords");
+            menu.add(0, 4, 0, "Change Password");
         }
         if (v.getId() == R.id.devicelist)
         {
@@ -353,6 +353,7 @@ public class AdminPage extends Activity {
                                                 device.getDeviceAddress(), (short) 0, data), device.getGatewayMacAddr(), device.getGatewayPassword(),
                                         device.getGatewaySSID(), AdminPage.this));
                                 device.setCurrentParams(data);
+                                device.setChannelMark((short) 0);
                                 DatabaseManager.getInstance().updateDevice(device);
                                 deviceIterator.remove();
                             }
@@ -448,6 +449,7 @@ public class AdminPage extends Activity {
                                         DeviceSocket.getInstance().send(Message.createMessage((byte) 4, DevicePacket.createPacket((byte) 4,
                                                         device.getDeviceAddress(), (short) 0, data), device.getGatewayMacAddr(), device.getGatewayPassword(),
                                                 device.getGatewaySSID(), AdminPage.this));
+                                        device.setChannelMark((short)0);
                                         device.setCurrentParams(data);
                                         DatabaseManager.getInstance().updateDevice(device);
                                         deviceIterator.remove();
@@ -510,6 +512,7 @@ public class AdminPage extends Activity {
                                                 device.getDeviceAddress(), (short) 0, data), device.getGatewayMacAddr(), device.getGatewayPassword(),
                                         device.getGatewaySSID(), AdminPage.this));
                                 device.setCurrentParams(data);
+                                device.setChannelMark((short) 0);
                                 DatabaseManager.getInstance().updateDevice(device);
                                 deviceIterator.remove();
                             }
@@ -527,8 +530,6 @@ public class AdminPage extends Activity {
                             }
                         }
                         DataManager.getInstance().setsector(sector);
-                        ListView deviceList = (ListView) findViewById(R.id.devicelist);
-                        deviceList.setAdapter(null);
                         deviceAdptername.remove(info.position);
                         deviceadapter.notifyDataSetChanged();
                         GetSummary();
@@ -590,6 +591,8 @@ public class AdminPage extends Activity {
 
     public void showDevice(View v)
     {
+        sector = DataManager.getInstance().getsector();
+        sectordetail = sector.get(userName);
         deviceAdptername = new ArrayList<>();
         sectorName = ((TextView) v).getText().toString();
         devicelistlayout.setVisibility(View.VISIBLE);

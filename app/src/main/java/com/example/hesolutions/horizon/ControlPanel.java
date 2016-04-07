@@ -251,7 +251,7 @@ public class ControlPanel extends Activity {
                             } else {
                                 controlbuilder = new AlertDialog.Builder(ControlPanel.this.getParent());
                                 controlbuilder.setTitle("Warning");
-                                controlbuilder.setMessage("Do you want to remove the control of the device?");
+                                controlbuilder.setMessage("Do you want to disable the manual control? \n(Note: Disabling manual control will make device fall under preset schedule)");
                                 controlbuilder.setCancelable(false);
                                 controlbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
@@ -263,7 +263,7 @@ public class ControlPanel extends Activity {
                                         adapter.notifyDataSetChanged();
                                     }
                                 });
-                                controlbuilder.setNegativeButton("No(keep control)", new DialogInterface.OnClickListener() {
+                                controlbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         byte[] data;
@@ -320,8 +320,7 @@ public class ControlPanel extends Activity {
                             } else {
                                 controlbuilder = new AlertDialog.Builder(ControlPanel.this.getParent());
                                 controlbuilder.setTitle("Warning");
-                                controlbuilder.setMessage("Do you want to remove the control of the device?");
-                                controlbuilder.setCancelable(false);
+                                controlbuilder.setMessage("Do you want to disable the manual control? \n(Note: Disabling manual control will make device fall under preset schedule)"); controlbuilder.setCancelable(false);
                                 controlbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
                                         byte[] data;
@@ -332,7 +331,7 @@ public class ControlPanel extends Activity {
                                         adapter.notifyDataSetChanged();
                                     }
                                 });
-                                controlbuilder.setNegativeButton("No(keep control)", new DialogInterface.OnClickListener() {
+                                controlbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
 
@@ -393,7 +392,7 @@ public class ControlPanel extends Activity {
             final String sectorname = getGroup(groupPosition);
             txtTitle.setText(sectorname);
             final ArrayList<Device> devicelist = sectordetail.get(sectorname);
-            if (devicelist!=null) {
+            if (devicelist!=null && !devicelist.isEmpty()) {
                 for (Device device:devicelist) {
                     Device sampledevice = DatabaseManager.getInstance().getDeviceInforName(device.getDeviceName());
                     if (!devicelist.isEmpty()) {
@@ -446,7 +445,7 @@ public class ControlPanel extends Activity {
                         Intensity.setVisibility(View.INVISIBLE);
 
                         if (!sectorname.equals(" ")) {
-                            if (devicelist != null) {
+                            if (devicelist != null && !devicelist.isEmpty()) {
                                 if (switchid.isChecked() == true) {
                                     for (Device thedevice : devicelist) {
                                         byte[] data;
@@ -464,8 +463,7 @@ public class ControlPanel extends Activity {
                                     } else {
                                         controlbuilder = new AlertDialog.Builder(ControlPanel.this.getParent());
                                         controlbuilder.setTitle("Warning");
-                                        controlbuilder.setMessage("Do you want to remove the control of the device?");
-                                        controlbuilder.setCancelable(false);
+                                        controlbuilder.setMessage("Do you want to disable the manual control? \rn(Note: Disabling manual control will make device fall under preset schedule)");controlbuilder.setCancelable(false);
                                         controlbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
                                                 for (Device thedevice : devicelist) {
@@ -478,7 +476,7 @@ public class ControlPanel extends Activity {
                                                 }
                                             }
                                         });
-                                        controlbuilder.setNegativeButton("No(keep control)", new DialogInterface.OnClickListener() {
+                                        controlbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
                                                 for (Device thedevice : devicelist) {

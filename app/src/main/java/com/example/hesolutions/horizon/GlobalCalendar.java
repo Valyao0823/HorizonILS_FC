@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.allin.activity.action.SysApplication;
+import com.google.common.collect.HashBiMap;
 import com.homa.hls.database.DatabaseManager;
 import com.homa.hls.database.Device;
 import com.homa.hls.database.Gateway;
@@ -56,7 +57,7 @@ public class GlobalCalendar extends Activity{
     private WeekView mWeekView;
     Handler myHandler;
     Runnable myRunnable;
-
+    String loginname;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -70,7 +71,7 @@ public class GlobalCalendar extends Activity{
         threedays = (Button)findViewById(R.id.threedays);
         sevendays = (Button)findViewById(R.id.sevendays);
         mWeekView = (WeekView) findViewById(R.id.weekView);
-
+        loginname = DataManager.getInstance().getUsername();
         myHandler = new Handler();
         myRunnable = new Runnable() {
             @Override
@@ -81,7 +82,6 @@ public class GlobalCalendar extends Activity{
             }
         };
         myHandler.postDelayed(myRunnable, 3*60*1000);
-
         MonthLoader.MonthChangeListener mMonthChangeListener = new MonthLoader.MonthChangeListener() {
             @Override
             public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
@@ -92,7 +92,6 @@ public class GlobalCalendar extends Activity{
                 */
                 List<WeekViewEvent> events;
                 events = DataManager.getInstance().getnewevents();
-                System.out.println("*************global page show " + events.size());
                 return events;
             }
 
@@ -106,7 +105,7 @@ public class GlobalCalendar extends Activity{
             @Override
             public void onEventLongPress(final WeekViewEvent event, RectF eventRect) {
 
-                if (event.getName().equals(DataManager.getInstance().getUsername()))
+                if (event.getName().equals(loginname))
                 {
                     final Gateway gateways = SysApplication.getInstance().getCurrGateway(GlobalCalendar.this);
                     final List<WeekViewEvent> listevent = DataManager.getInstance().getnewevents();
@@ -163,7 +162,7 @@ public class GlobalCalendar extends Activity{
                 Toast.makeText(GlobalCalendar.this, "Created by " + event.getName() + "\nStarting at "
                         + event.getStartTime().getTime()+
                         "\nFinishing at " + event.getEndTime().getTime()
-                        +"\nName is: " + event.getName() + " ID is: "+event.getId(), Toast.LENGTH_SHORT).show();
+                        +"\nName is: " + event.getName() + "\nSectors included: " + event.getdeviceList().toString(), Toast.LENGTH_SHORT).show();
             }
 
         };
@@ -189,12 +188,17 @@ public class GlobalCalendar extends Activity{
                 Bitmap bitmap = getScreenShot(rootView);
                 DataManager.getInstance().setBitmap(bitmap);
 
-                Intent startNewActivityIntent = new Intent(GlobalCalendar.this, CalendarTask.class);
-                startNewActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                ActivityStack activityStack = (ActivityStack) getParent();
-                activityStack.push("SecondActivity", startNewActivityIntent);
-                DataManager.getInstance().setactivity(activityStack.popid());
-
+                HashMap<String, HashMap<String, ArrayList<Device>>> sector = DataManager.getInstance().getsector();
+                HashMap<String, ArrayList<Device>> sectorinformation = sector.get(loginname);
+                if (sectorinformation!=null && !sectorinformation.isEmpty()) {
+                    Intent startNewActivityIntent = new Intent(GlobalCalendar.this, CalendarTask.class);
+                    startNewActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    ActivityStack activityStack = (ActivityStack) getParent();
+                    activityStack.push("SecondActivity", startNewActivityIntent);
+                    DataManager.getInstance().setactivity(activityStack.popid());
+                }else{
+                    Toast.makeText(GlobalCalendar.this, "You are not assigned any sector yet.", Toast.LENGTH_SHORT).show();
+                }
                 /*
                 Intent startNewActivityIntent = new Intent(GlobalCalendar.this, CalendarTask.class);
                 startNewActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -257,7 +261,7 @@ public class GlobalCalendar extends Activity{
 
         return bitmap;
     }
-
+/*
     public void CheckCurrent(WeekViewEvent event)
     {
         Calendar cur = Calendar.getInstance();
@@ -287,7 +291,7 @@ public class GlobalCalendar extends Activity{
             }
         }
     }
-
+*/
 
     @Override
     public void onUserInteraction()

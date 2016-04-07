@@ -154,7 +154,7 @@ public class DataManager {
         return events;
     }
 
-    public List setevents(List<WeekViewEvent> list)
+    public synchronized List setevents(List<WeekViewEvent> list)
     {
         this.events = list;
         writedata1(events, "calendar");
@@ -168,7 +168,7 @@ public class DataManager {
         return newevents;
     }
 
-    public List setnewevents(List<WeekViewEvent> list)
+    public synchronized List setnewevents(List<WeekViewEvent> list)
     {
         this.newevents = list;
         writedata1(newevents, "schedule");
@@ -360,7 +360,6 @@ public class DataManager {
                 e.printStackTrace();
             }
         }
-        System.out.println("reading from the file******************************" + listone.size());
         return listone;
     }
 
