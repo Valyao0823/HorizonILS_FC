@@ -130,7 +130,9 @@ public class ControlPanel extends Activity {
                     @Override
                     public void run() {
                         System.out.println("******************* real time status");
-                        adapter.notifyDataSetChanged();
+                        if (adapter!=null) {
+                            adapter.notifyDataSetChanged();
+                        }
                     }
                 });
             }

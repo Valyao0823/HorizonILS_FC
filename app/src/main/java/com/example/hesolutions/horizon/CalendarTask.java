@@ -614,7 +614,7 @@ public class CalendarTask extends Activity {
                                     } else {
                                         runOnUiThread(new Runnable() {
                                             public void run() {
-                                                Toast.makeText(CalendarTask.this, "Invaild time", Toast.LENGTH_LONG).show();
+                                                Toast.makeText(CalendarTask.this, "Invalid time", Toast.LENGTH_LONG).show();
                                             }
                                         });
                                     }

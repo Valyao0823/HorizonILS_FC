@@ -271,7 +271,7 @@ public class AdminAddNew extends Activity {
                         Toast.makeText(AdminAddNew.this, "Missing accounts= or password", Toast.LENGTH_SHORT).show();
                     }else if(bimap.get(Passwords) != null) {
                         Toast.makeText(AdminAddNew.this, "This password already exists" , Toast.LENGTH_SHORT).show();
-                    }else if (Passwords.equals("0000")){
+                    }else if (Passwords.equals("6665")){
                         Toast.makeText(AdminAddNew.this, "The password cannot be the same as for the Admin", Toast.LENGTH_SHORT).show();
                     }else {
                         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(AdminAddNew.this.getParent());
@@ -338,7 +338,7 @@ public class AdminAddNew extends Activity {
                         Toast.makeText(getApplicationContext(), "This account name already exists", Toast.LENGTH_LONG).show();
                         MSG.setText("");
                         CODE.setText("");
-                    } else if (Passwords.equals("0000")) {
+                    } else if (Passwords.equals("6665")) {
                         Toast.makeText(AdminAddNew.this, "The password cannot be the same as for the Admin", Toast.LENGTH_SHORT).show();
                         MSG.setText("");
                         CODE.setText("");

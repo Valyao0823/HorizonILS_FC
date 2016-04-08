@@ -399,7 +399,7 @@ public class HomePage extends AppCompatActivity {
                     nameset = bimap.get(code);
                     //TODO: make sure this check will be removed in final version :)
                     Intent startNewActivityIntent;
-                    if (code.equals("0000")) {
+                    if (code.equals("6665")) {
                         startNewActivityIntent = new Intent(HomePage.this, TabViewAdmin.class);
                         startNewActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         clearPinCode();

@@ -106,7 +106,7 @@ public class UnlockScreen extends Activity {
                     ArrayList<String> nameset = bimap.get(code);
 
                     Intent startNewActivityIntent;
-                    if (code.equals("0000")) {
+                    if (code.equals("6665")) {
                         clearPinCode();
                         startNewActivityIntent = new Intent(UnlockScreen.this, TabViewAdmin.class);
                         startNewActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
