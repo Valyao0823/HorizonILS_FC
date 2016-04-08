@@ -60,6 +60,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class ControlPanel extends Activity {
 
@@ -68,16 +70,15 @@ public class ControlPanel extends Activity {
     HashMap<String, ArrayList> sectordetail = sector.get(username);
     ArrayList<String> sectorArray = new ArrayList<>();
     EnhancedSeekBar seekBar;
-    String str1;
-    String str2;
     byte intensity;
     ImageView imageViewroomlayout;
     ExpandListAdapter adapter;
     TextView Intensity, ownertag, owner, sectortag, sectornameT, devicetag, devicenameT, Intensitynum;
-    Handler myHandler;
+    Handler myHandler, rthandler;
     Runnable myRunnable;
     AlertDialog controlalertdialog;
     AlertDialog.Builder controlbuilder = null;
+    Timer rtstatus;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -119,6 +120,22 @@ public class ControlPanel extends Activity {
             }
         };
         myHandler.postDelayed(myRunnable, 3*60*1000);
+
+        rtstatus = new Timer();
+        rthandler = new Handler();
+        rtstatus.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                rthandler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("******************* real time status");
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }, Calendar.getInstance().getTime(), 5 * 1000);
+
     }
 
     public class ExpandListAdapter extends BaseExpandableListAdapter {
@@ -469,7 +486,7 @@ public class ControlPanel extends Activity {
                                     } else {
                                         controlbuilder = new AlertDialog.Builder(ControlPanel.this.getParent());
                                         controlbuilder.setTitle("Warning");
-                                        controlbuilder.setMessage("Do you want to disable the manual control? \rn(Note: Disabling manual control will make device fall under preset schedule)");controlbuilder.setCancelable(false);
+                                        controlbuilder.setMessage("Do you want to disable the manual control? \n(Note: Disabling manual control will make device fall under preset schedule)");controlbuilder.setCancelable(false);
                                         controlbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialog, int which) {
                                                 for (Device thedevice : devicelist) {
@@ -585,11 +602,20 @@ public class ControlPanel extends Activity {
     public void onPause()
     {
         super.onPause();
-        myHandler.removeCallbacks(myRunnable);
+        rtstatus.cancel();
     }
     @Override
     public void onBackPressed()
     {
         // super.onBackPressed(); // Comment this super call to avoid calling finish()
     }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        rtstatus.cancel();
+        myHandler.removeCallbacks(myRunnable);
+    }
+
 }

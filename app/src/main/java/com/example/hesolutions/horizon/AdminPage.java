@@ -29,6 +29,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -68,7 +69,7 @@ public class AdminPage extends Activity {
     ArrayList<Device> mDeviceList;
     TextView inforsumuser,inforsumsector,inforsumdevice;
     Button adduser, addsector, adddevice;
-    RelativeLayout userlistlayout, sectorlistlayout, devicelistlayout, infor;
+    RelativeLayout userlistlayout, sectorlistlayout, devicelistlayout, infor, progresslayout;
     String userName = "";
     String sectorName = "";
     String deviceName = "";
@@ -90,7 +91,7 @@ public class AdminPage extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admin_page);
-
+        progresslayout = (RelativeLayout)findViewById(R.id.progresslayout);
         userlistlayout = (RelativeLayout)findViewById(R.id.userlistlayout);
         sectorlistlayout = (RelativeLayout)findViewById(R.id.sectorlistlayout);
         devicelistlayout = (RelativeLayout)findViewById(R.id.devicelistlayout);
@@ -151,15 +152,22 @@ public class AdminPage extends Activity {
                 loaddevice.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-                        Bitmap bitmap = getScreenShot(rootView);
-                        DataManager.getInstance().setBitmap(bitmap);
-                        Intent startNewActivityIntent = new Intent(AdminPage.this, AdminAddNew.class);
-                        startNewActivityIntent.putExtra("Case", 7);
-                        startNewActivityIntent.putExtra("userName", userName);
-                        startNewActivityIntent.putExtra("sectorName", sectorName);
-                        ActivityAdminStack activityadminStack = (ActivityAdminStack) getParent();
-                        activityadminStack.push("AdminAddNew", startNewActivityIntent);
+
+                        ArrayList<Device> devices = DatabaseManager.getInstance().LoadDeviceList("devicelist");
+                        if (devices==null || devices.isEmpty())
+                        {
+                            Toast.makeText(AdminPage.this, "No device has been scanned yet.", Toast.LENGTH_SHORT).show();
+                        }else {
+                            View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+                            Bitmap bitmap = getScreenShot(rootView);
+                            DataManager.getInstance().setBitmap(bitmap);
+                            Intent startNewActivityIntent = new Intent(AdminPage.this, AdminAddNew.class);
+                            startNewActivityIntent.putExtra("Case", 7);
+                            startNewActivityIntent.putExtra("userName", userName);
+                            startNewActivityIntent.putExtra("sectorName", sectorName);
+                            ActivityAdminStack activityadminStack = (ActivityAdminStack) getParent();
+                            activityadminStack.push("AdminAddNew", startNewActivityIntent);
+                        }
 
                         alertDialog.dismiss();
                     }
@@ -321,9 +329,21 @@ public class AdminPage extends Activity {
             alertDialog.setMessage("Do you want to remove the sector?");
             alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
                     ArrayList<Device> array = (ArrayList<Device>) sector.get(userName).get(sectorName);
                     //// delete the lights if this sector is the last one contains device information
-                    RemoveEvents(userName, sectorName);
+                    ProgressBar progressBar = (ProgressBar)findViewById(R.id.progressBar);
+                    progresslayout.setClickable(true);
+                    progressBar.setVisibility(View.VISIBLE);
+
+                    Runnable r = new Runnable() {
+                        public void run() {
+                            RemoveEvents(userName, sectorName);
+                        }
+                    };
+
+                    new Thread(r).start();
+
                     boolean deletedevice = true;
                     HashMap<String, HashMap> sector = DataManager.getInstance().getsector();
                     if (!sector.isEmpty()) {
@@ -380,6 +400,7 @@ public class AdminPage extends Activity {
                     DataManager.getInstance().setsector(sector);
                     sectorArray.remove(info.position);
                     sectoradapter.notifyDataSetChanged();
+                    progressBar.setVisibility(View.INVISIBLE);
                     adddevice.setVisibility(View.INVISIBLE);
                     GetSummary();
                 }
@@ -392,15 +413,26 @@ public class AdminPage extends Activity {
             alertDialog.show();
         }else if (menuItemIndex == 0)
         {
-            View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
-            Bitmap bitmap = getScreenShot(rootView);
-            DataManager.getInstance().setBitmap(bitmap);
-            Intent startNewActivityIntent = new Intent(AdminPage.this, AdminAddNew.class);
-            startNewActivityIntent.putExtra("Case", 4);
-            startNewActivityIntent.putExtra("UserName",userName);
-            startNewActivityIntent.putExtra("SectorName",sectorArray.get(info.position));
-            ActivityAdminStack activityadminStack = (ActivityAdminStack) getParent();
-            activityadminStack.push("AdminAddNew", startNewActivityIntent);
+            BiMap<String, ArrayList> account = DataManager.getInstance().getaccount();
+            ArrayList<String> usernumber = new ArrayList<>();
+            if (account!=null) {
+                for (Map.Entry<String, ArrayList> map : account.entrySet()) {
+                    usernumber.add(map.getKey());
+                }
+            }
+            if (usernumber!=null && usernumber.size() > 1) {
+                View rootView = getWindow().getDecorView().findViewById(android.R.id.content);
+                Bitmap bitmap = getScreenShot(rootView);
+                DataManager.getInstance().setBitmap(bitmap);
+                Intent startNewActivityIntent = new Intent(AdminPage.this, AdminAddNew.class);
+                startNewActivityIntent.putExtra("Case", 4);
+                startNewActivityIntent.putExtra("UserName", userName);
+                startNewActivityIntent.putExtra("SectorName", sectorArray.get(info.position));
+                ActivityAdminStack activityadminStack = (ActivityAdminStack) getParent();
+                activityadminStack.push("AdminAddNew", startNewActivityIntent);
+            }else{
+                Toast.makeText(AdminPage.this, "There are no available users to share the sector.", Toast.LENGTH_SHORT).show();
+            }
         }else if (menuItemIndex == 2)
         {
 
@@ -409,6 +441,7 @@ public class AdminPage extends Activity {
             alertDialog.setMessage("Do you want to delete the user?");
             alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
                     boolean deletedevice = true;
                     //// delete the lights if this sector is the last one contains device information
                     HashMap<String, ArrayList<Device>> sectorinformation = sector.get(userName);
@@ -471,12 +504,22 @@ public class AdminPage extends Activity {
                         }
                     }
 
-                    RemoveEventsUser();
+                    ProgressBar progressBar = (ProgressBar)findViewById(R.id.progressBar);
+                    progresslayout.setClickable(true);
+                    progressBar.setVisibility(View.VISIBLE);
+                    Runnable r = new Runnable() {
+                        public void run() {
+                            RemoveEventsUser();
+                        }
+                    };
+
+                    new Thread(r).start();
 
                     sector.remove(userName);
                     DataManager.getInstance().setsector(sector);
                     names.remove(userName);
                     useradapter.notifyDataSetChanged();
+                    progressBar.setVisibility(View.INVISIBLE);
                     ListView deviceList = (ListView) findViewById(R.id.devicelist);
                     deviceList.setAdapter(null);
                     ListView sectorlist = (ListView) findViewById(R.id.sectorlist);
@@ -788,6 +831,12 @@ public class AdminPage extends Activity {
     public void onBackPressed()
     {
         // super.onBackPressed(); // Comment this super call to avoid calling finish()
+    }
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        myHandler.removeCallbacks(myRunnable);
     }
 }
 

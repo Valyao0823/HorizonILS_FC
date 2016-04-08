@@ -471,4 +471,10 @@ public class PaintPage extends Activity{
     {
         // super.onBackPressed(); // Comment this super call to avoid calling finish()
     }
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        myHandler.removeCallbacks(myRunnable);
+    }
 }

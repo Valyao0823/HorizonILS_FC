@@ -369,7 +369,6 @@ public class AdminAddNew extends Activity {
         savesector.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                HashMap<String, ArrayList> sectordetail1 = new HashMap<String, ArrayList>();
                 String name = sectorname.getText().toString();
                 boolean uniquesectorname = true;
                 if (name.equals("")) {
@@ -378,7 +377,7 @@ public class AdminAddNew extends Activity {
                     Toast.makeText(AdminAddNew.this, "No spaces allowed", Toast.LENGTH_SHORT).show();
                     sectorname.setText("");
                 }else {
-
+                    sector = DataManager.getInstance().getsector();
                     for (Map.Entry<String, HashMap> entry : sector.entrySet()) {
                         HashMap<String, ArrayList> value = entry.getValue();
                         if (value!=null) {
@@ -391,32 +390,19 @@ public class AdminAddNew extends Activity {
                             }
                         }
                     }
-
                     sectordetail = sector.get(userName);
                     if (uniquesectorname == true) {
                         if (sectordetail != null) {
-                            if (sectordetail.isEmpty()) {
-                                HashMap<String, ArrayList<Device>> sectordetail2 = new HashMap<String, ArrayList<Device>>();
-                                sectordetail2.put(name, null);
-                                sector.put(userName, sectordetail2);
-                                DataManager.getInstance().setsector(sector);
-                                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                                ActivityAdminStack activityAdminStack = (ActivityAdminStack) getParent();
-                                activityAdminStack.pop();
-                                Toast.makeText(getApplicationContext(), "Data saved successfully!", Toast.LENGTH_LONG).show();
-                            } else {
-                                sectordetail1 = sector.get(userName);
-                                sectordetail1.put(name, null);
-                                sector.remove(userName);
-                                sector.put(userName, sectordetail1);
-                                DataManager.getInstance().setsector(sector);
-                                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                                imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
-                                ActivityAdminStack activityAdminStack = (ActivityAdminStack) getParent();
-                                activityAdminStack.pop();
-                                Toast.makeText(getApplicationContext(), "Data saved successfully!", Toast.LENGTH_LONG).show();
-                            }
+                            HashMap<String, ArrayList<Device>> sectordetail2 = new HashMap<String, ArrayList<Device>>();
+                            sectordetail2.putAll(sectordetail);
+                            sectordetail2.put(name, null);
+                            sector.put(userName, sectordetail2);
+                            DataManager.getInstance().setsector(sector);
+                            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                            ActivityAdminStack activityAdminStack = (ActivityAdminStack) getParent();
+                            activityAdminStack.pop();
+                            Toast.makeText(getApplicationContext(), "Data saved successfully!", Toast.LENGTH_LONG).show();
                         } else {
                             HashMap<String, ArrayList<Device>> sectordetail2 = new HashMap<String, ArrayList<Device>>();
                             sectordetail2.put(name, null);
@@ -438,6 +424,7 @@ public class AdminAddNew extends Activity {
             @Override
             public void onClick(View v) {
                 String name = devicename.getText().toString();
+                sector = DataManager.getInstance().getsector();
                 sectordetail = sector.get(userName);
                 ArrayList<Device> mDeviceList = sectordetail.get(sectorName);
                 if (name.equals("")) {
@@ -531,6 +518,7 @@ public class AdminAddNew extends Activity {
                         }
                     }
                 }
+                sector = DataManager.getInstance().getsector();
                 sectordetail = sector.get(UserName);
                 final ArrayList<Device> list = sectordetail.get(SectorName);
                 HashMap<String, ArrayList<Device>> newassignsector = new HashMap<String, ArrayList<Device>>();
@@ -590,6 +578,7 @@ public class AdminAddNew extends Activity {
                         }
                     }
                 }
+                sector = DataManager.getInstance().getsector();
                 sectordetail = sector.get(UserName);
                 final ArrayList<Device> list = sectordetail.get(SectorName);
 
@@ -681,6 +670,7 @@ public class AdminAddNew extends Activity {
         oldcolor= "";
         sectordetail = null;
         sector = null;
+        myHandler.removeCallbacks(myRunnable);
     }
 
     private boolean findDeviceName(String deviceName) {
@@ -912,7 +902,7 @@ public class AdminAddNew extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-        myHandler.postDelayed(myRunnable, 6*30 * 1000);
+        myHandler.postDelayed(myRunnable, 6 * 30 * 1000);
     }
 
     @Override
@@ -926,4 +916,6 @@ public class AdminAddNew extends Activity {
     {
         // super.onBackPressed(); // Comment this super call to avoid calling finish()
     }
+
+
 }

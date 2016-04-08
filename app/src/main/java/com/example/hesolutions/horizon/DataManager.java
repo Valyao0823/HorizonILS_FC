@@ -117,7 +117,7 @@ public class DataManager {
         return sector;
     }
 
-    public HashMap setsector(HashMap sectorinfo) {
+    public synchronized HashMap setsector(HashMap sectorinfo) {
         this.sector = sectorinfo;
         writedata(sector, "sector");
         return sector;

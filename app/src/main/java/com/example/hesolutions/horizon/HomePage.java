@@ -140,10 +140,10 @@ public class HomePage extends AppCompatActivity {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                    System.out.println("************ load new events");
+                    System.out.println("******************************************** load new events");
                     GetNewEvent();
             }
-        }, newtoday.getTime(), 1000 * 60 * 60);
+        }, newtoday.getTime(), 1000 * 60 * 60 * 12);
 
 
         final Timer maintimer = new Timer();

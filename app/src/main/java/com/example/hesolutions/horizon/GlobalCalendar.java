@@ -197,7 +197,7 @@ public class GlobalCalendar extends Activity{
                     activityStack.push("SecondActivity", startNewActivityIntent);
                     DataManager.getInstance().setactivity(activityStack.popid());
                 }else{
-                    Toast.makeText(GlobalCalendar.this, "You are not assigned any sector yet.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(GlobalCalendar.this, "You have not been assigned to any sector yet.", Toast.LENGTH_SHORT).show();
                 }
                 /*
                 Intent startNewActivityIntent = new Intent(GlobalCalendar.this, CalendarTask.class);
