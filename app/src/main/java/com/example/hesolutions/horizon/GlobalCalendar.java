@@ -58,6 +58,7 @@ public class GlobalCalendar extends Activity{
     Handler myHandler;
     Runnable myRunnable;
     String loginname;
+    MonthLoader.MonthChangeListener mMonthChangeListener = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -82,7 +83,7 @@ public class GlobalCalendar extends Activity{
             }
         };
         myHandler.postDelayed(myRunnable, 3*60*1000);
-        MonthLoader.MonthChangeListener mMonthChangeListener = new MonthLoader.MonthChangeListener() {
+        mMonthChangeListener = new MonthLoader.MonthChangeListener() {
             @Override
             public List<WeekViewEvent> onMonthChange(int newYear, int newMonth) {
                 // Populate the week view with some events.
@@ -312,11 +313,19 @@ public class GlobalCalendar extends Activity{
     {
         super.onPause();
         myHandler.removeCallbacks(myRunnable);
+        mWeekView.setMonthChangeListener(mMonthChangeListener);
     }
 
     @Override
     public void onBackPressed()
     {
         // super.onBackPressed(); // Comment this super call to avoid calling finish()
+    }
+
+    @Override
+    public void onDestroy()
+    {
+        super.onDestroy();
+        myHandler.removeCallbacks(myRunnable);
     }
 }

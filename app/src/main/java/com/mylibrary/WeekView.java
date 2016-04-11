@@ -107,8 +107,8 @@ public class WeekView extends View {
     private int mFutureBackgroundColor = Color.rgb(9, 25, 40);
     private int mPastWeekendBackgroundColor = 0;
     private int mFutureWeekendBackgroundColor = 0;
-    private int mNowLineColor = Color.rgb(102, 102, 102);
-    private int mNowLineThickness = 5;
+    private int mNowLineColor = Color.rgb(255, 255, 255);
+    private int mNowLineThickness = 2;
     private int mHourSeparatorColor = Color.rgb(9, 25, 40);
     private int mTodayBackgroundColor = Color.rgb(9, 25, 40);
     private int mHourSeparatorHeight = 2;
@@ -127,7 +127,7 @@ public class WeekView extends View {
     private double mScrollToHour = -1;
     private int mEventCornerRadius = 0;
     private boolean mShowDistinctWeekendColor = false;
-    private boolean mShowNowLine = false;
+    private boolean mShowNowLine = true;
     private boolean mShowDistinctPastFutureColor = false;
 
     // Listeners.
@@ -629,6 +629,7 @@ public class WeekView extends View {
             drawEvents(day, startPixel, canvas);
 
             // Draw the line at the current time.
+            mShowNowLine = true;
             if (mShowNowLine && sameDay){
                 float startY = mHeaderTextHeight + mHeaderRowPadding * 2 + mTimeTextHeight/2 + mHeaderMarginBottom + mCurrentOrigin.y;
                 Calendar now = Calendar.getInstance();

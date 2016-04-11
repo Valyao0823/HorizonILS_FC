@@ -974,4 +974,5 @@ public class CalendarTask extends Activity {
         super.onDestroy();
         myHandler.removeCallbacks(myRunnable);
     }
+
 }

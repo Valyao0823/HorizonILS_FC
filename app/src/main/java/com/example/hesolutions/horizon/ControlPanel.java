@@ -129,7 +129,6 @@ public class ControlPanel extends Activity {
                 rthandler.post(new Runnable() {
                     @Override
                     public void run() {
-                        System.out.println("******************* real time status");
                         if (adapter!=null) {
                             adapter.notifyDataSetChanged();
                         }
