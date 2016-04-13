@@ -343,7 +343,7 @@ public class HomePage extends AppCompatActivity {
                 while (deviceiterator.hasNext()) {
                     Device device = deviceiterator.next();
                     Device thedevice = DatabaseManager.getInstance().getDeviceInforName(device.getDeviceName());
-                    if (thedevice != null) {
+                    if (thedevice!= null) {
                         if (thedevice.getChannelMark() != 5) {
                             byte[] data;
                             data = new byte[]{(byte) 17, (byte) 0, (byte) 0, (byte) 0, (byte) 0};

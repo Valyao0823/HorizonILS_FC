@@ -14,6 +14,7 @@
         android:layout_marginTop="10dp"
         android:childDivider="#00000000"
         android:groupIndicator="@null"
+        android:scrollbars="none"
         />
     <!--
 <ListView
@@ -152,6 +153,51 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/seekBar"
+            android:progressDrawable="@color/wordscolor"
+            android:thumb="@drawable/repswitch"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/Intensitynum"
+            android:layout_centerVertical="true"
+            android:visibility="invisible"
+            android:layout_marginBottom="20dp"
+            />
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/IntensitySector"
+            android:text="INTENSITY(G):"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_below="@+id/devicenameT"
+            android:layout_alignParentLeft="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:visibility="invisible"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/IntensitynumSector"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:textColor="@color/wordscolor"
+            android:layout_below="@+id/Intensity"
+            android:layout_alignParentLeft="true"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:visibility="invisible"
+            />
+
+        <com.example.hesolutions.horizon.EnhancedSeekBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/seekBarSector"
             android:progressDrawable="@color/wordscolor"
             android:thumb="@drawable/repswitch"
             android:layout_alignParentLeft="true"

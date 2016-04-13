@@ -58,7 +58,7 @@ public class TabiewForUser extends TabActivity {
         getTabHost().setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             @Override
             public void onTabChanged(String tabId) {
-                if (tabId == "Logout") {
+                if (tabId.equals("Logout")) {
                     overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                     finish();
                 }

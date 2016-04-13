@@ -47,7 +47,7 @@ public class TabViewAdmin extends TabActivity {
         tabHost.setCurrentTab(0);
         getTabHost().setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             public void onTabChanged(String tabId) {
-                if (tabId == "Logout") {
+                if (tabId.equals("Logout")) {
                     overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                     finish();
                 }

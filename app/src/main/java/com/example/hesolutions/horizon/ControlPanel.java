@@ -69,16 +69,17 @@ public class ControlPanel extends Activity {
     String username =DataManager.getInstance().getUsername();
     HashMap<String, ArrayList> sectordetail = sector.get(username);
     ArrayList<String> sectorArray = new ArrayList<>();
-    EnhancedSeekBar seekBar;
-    byte intensity;
+    EnhancedSeekBar seekBar, seekBarSector;
+    byte intensity, sectorintensity;
     ImageView imageViewroomlayout;
     ExpandListAdapter adapter;
-    TextView Intensity, ownertag, owner, sectortag, sectornameT, devicetag, devicenameT, Intensitynum;
+    TextView Intensity, ownertag, owner, sectortag, sectornameT, devicetag, devicenameT, Intensitynum, IntensitySector, IntensitynumSector;
     Handler myHandler, rthandler;
     Runnable myRunnable;
     AlertDialog controlalertdialog;
     AlertDialog.Builder controlbuilder = null;
     Timer rtstatus;
+    String choosesector;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -86,6 +87,7 @@ public class ControlPanel extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_control_panel);
         seekBar = (EnhancedSeekBar)findViewById(R.id.seekBar);
+        seekBarSector = (EnhancedSeekBar)findViewById(R.id.seekBarSector);
         imageViewroomlayout = (ImageView)findViewById(R.id.imageViewroomlayout);
         ownertag = (TextView)findViewById(R.id.ownertag);
         owner = (TextView)findViewById(R.id.owner);
@@ -95,6 +97,8 @@ public class ControlPanel extends Activity {
         devicenameT = (TextView)findViewById(R.id.devicenameT);
         Intensity = (TextView)findViewById(R.id.Intensity);
         Intensitynum = (TextView)findViewById(R.id.Intensitynum);
+        IntensitySector = (TextView)findViewById(R.id.IntensitySector);
+        IntensitynumSector = (TextView)findViewById(R.id.IntensitynumSector);
         if (sector.get(username) == null) {
         } else {
             for (Map.Entry<String, ArrayList> entry : sectordetail.entrySet()) {
@@ -208,6 +212,9 @@ public class ControlPanel extends Activity {
                     seekBar.setVisibility(View.VISIBLE);
                     Intensitynum.setVisibility(View.VISIBLE);
                     Intensity.setVisibility(View.VISIBLE);
+                    seekBarSector.setVisibility(View.INVISIBLE);
+                    IntensitynumSector.setVisibility(View.INVISIBLE);
+                    IntensitySector.setVisibility(View.INVISIBLE);
                     DataManager.getInstance().setthedevice(deviceA);
                     if (switchid.isChecked() == true) {
                         seekBar.setProgressProgrammatically(intensity);
@@ -325,7 +332,9 @@ public class ControlPanel extends Activity {
                         seekBar.setVisibility(View.INVISIBLE);
                         Intensitynum.setVisibility(View.INVISIBLE);
                         Intensity.setVisibility(View.INVISIBLE);
-
+                        seekBarSector.setVisibility(View.INVISIBLE);
+                        IntensitynumSector.setVisibility(View.INVISIBLE);
+                        IntensitySector.setVisibility(View.INVISIBLE);
                         if (switchid.isChecked() == true) {
                             byte[] data;
                             data = new byte[]{(byte) 17, (byte) 100, (byte) 0, (byte) 0, (byte) 0};
@@ -422,6 +431,7 @@ public class ControlPanel extends Activity {
                     if (!devicelist.isEmpty()) {
                         if (sampledevice.getCurrentParams()[1]!=0) {
                             switchid.setCheckedProgrammatically(true);
+                            sectorintensity = sampledevice.getCurrentParams()[1];
                             break;
                         } else {
                             switchid.setCheckedProgrammatically(false);
@@ -439,13 +449,25 @@ public class ControlPanel extends Activity {
             txtTitle.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    seekBarSector.setVisibility(View.VISIBLE);
+                    IntensitynumSector.setVisibility(View.VISIBLE);
+                    IntensitySector.setVisibility(View.VISIBLE);
                     seekBar.setVisibility(View.INVISIBLE);
                     Intensitynum.setVisibility(View.INVISIBLE);
                     Intensity.setVisibility(View.INVISIBLE);
+                    choosesector = ((TextView)v).getText().toString();
+                    if (switchid.isChecked() == true) {
+                        seekBarSector.setProgressProgrammatically(sectorintensity);
+                        IntensitynumSector.setText(Integer.toString(sectorintensity) + "%");
+                    } else {
+                        seekBarSector.setProgressProgrammatically(0);
+                        IntensitynumSector.setText("0%");
+                    }
+
+
                     if (isExpanded) ((ExpandableListView) parent).collapseGroup(groupPosition);
                     else ((ExpandableListView) parent).expandGroup(groupPosition, true);
-                    Bitmap bitmap = null;
-                    bitmap = dataupdate(sectorname + ".png");
+                    Bitmap bitmap = dataupdate(sectorname + ".png");
                     if (bitmap != null) {
                         Drawable d = new BitmapDrawable(getResources(), bitmap);
                         imageViewroomlayout.setBackground(d);
@@ -459,6 +481,101 @@ public class ControlPanel extends Activity {
                     devicenameT.setVisibility(View.INVISIBLE);
                 }
             });
+
+            seekBarSector.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                int progressfinal;
+                ArrayList<Device> thisdevicelist = sectordetail.get(choosesector);
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    Gateway gateway = SysApplication.getInstance().getCurrGateway(ControlPanel.this);
+                    if (gateway != null) {
+                        progressfinal = progress;
+                        Intensitynum.setText(Integer.toString(progress) + "%");
+                    } else {
+                        Showlog();
+                        seekBar.setEnabled(false);
+                    }
+                }
+
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
+                    Gateway gateway = SysApplication.getInstance().getCurrGateway(ControlPanel.this);
+                    if (gateway != null) {
+                        seekBar.setEnabled(true);
+                        IntensitynumSector.setText(Integer.toString(progressfinal) + "%");
+                        final byte[] SetParams = new byte[5];
+                        if (progressfinal == 0) {
+                            SetParams[0] = (byte) 17;
+                            SetParams[1] = (byte) 0;
+                            SetParams[2] = (byte) 0;
+                            SetParams[3] = (byte) 0;
+                            SetParams[4] = (byte) 0;
+                        } else {
+                            SetParams[0] = (byte) 17;
+                            SetParams[1] = (byte) progressfinal;
+                            SetParams[2] = (byte) 0;
+                            SetParams[3] = (byte) 0;
+                            SetParams[4] = (byte) 0;
+                        }
+
+                        if (progressfinal == 0) {
+                            if (controlalertdialog != null && controlalertdialog.isShowing()) {
+                            } else {
+                                controlbuilder = new AlertDialog.Builder(ControlPanel.this.getParent());
+                                controlbuilder.setTitle("Warning");
+                                controlbuilder.setMessage("Do you want to disable the manual control? \n(Note: Disabling manual control will make device fall under preset schedule)");
+                                controlbuilder.setCancelable(false);
+                                controlbuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        for (Device thedevice : thisdevicelist) {
+                                            byte[] data;
+                                            data = new byte[]{(byte) 17, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
+                                            thedevice.setCurrentParams(data);
+                                            thedevice.setChannelMark((short)0);
+                                            DatabaseManager.getInstance().updateDevice(thedevice);
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                });
+                                controlbuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        for (Device thedevice : thisdevicelist) {
+                                            byte[] data;
+                                            data = new byte[]{(byte) 17, (byte) 0, (byte) 0, (byte) 0, (byte) 0};
+                                            thedevice.setCurrentParams(data);
+                                            thedevice.setChannelMark((short) 5);
+                                            DatabaseManager.getInstance().updateDevice(thedevice);
+                                            adapter.notifyDataSetChanged();
+                                        }
+                                    }
+                                });
+                                controlalertdialog = controlbuilder.create();
+                                controlalertdialog.show();
+                            }
+                        } else {
+                            for (Device thedevice : thisdevicelist) {
+                                DeviceSocket.getInstance().send(Message.createMessage((byte) 4, DevicePacket.createPacket((byte) 4,
+                                                thedevice.getDeviceAddress(), (short) 0, SetParams), thedevice.getGatewayMacAddr(), thedevice.getGatewayPassword(),
+                                        thedevice.getGatewaySSID(), ControlPanel.this));
+                                thedevice.setCurrentParams(SetParams);
+                                thedevice.setChannelMark((short) 5);
+                                DatabaseManager.getInstance().updateDevice(thedevice);
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+                    } else {
+                        Showlog();
+                        seekBarSector.setEnabled(false);
+                    }
+                }
+            });
+
             switchid.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -467,7 +584,9 @@ public class ControlPanel extends Activity {
                         seekBar.setVisibility(View.INVISIBLE);
                         Intensitynum.setVisibility(View.INVISIBLE);
                         Intensity.setVisibility(View.INVISIBLE);
-
+                        seekBarSector.setVisibility(View.INVISIBLE);
+                        IntensitynumSector.setVisibility(View.INVISIBLE);
+                        IntensitySector.setVisibility(View.INVISIBLE);
                         if (!sectorname.equals(" ")) {
                             if (devicelist != null && !devicelist.isEmpty()) {
                                 if (switchid.isChecked() == true) {
